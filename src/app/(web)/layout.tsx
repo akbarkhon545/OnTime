@@ -43,6 +43,7 @@ export default async function WebLayout({
           <NavLink href="/dashboard" icon="📊" label={t.dashboard} />
           <NavLink href="/tasks" icon="📋" label={t.tasks} />
           <NavLink href="/calendar" icon="📅" label={t.calendar} />
+          <NavLink href="/notes" icon="📝" label={t.notes} />
           <NavLink href="/categories" icon="🏷️" label={t.categories} />
           <NavLink href="/settings" icon="⚙️" label={t.settings} />
         </nav>

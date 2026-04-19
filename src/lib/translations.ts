@@ -5,6 +5,7 @@ export const translations = {
     tasks: "Vazifalar",
     calendar: "Kalendar",
     categories: "Kategoriyalar",
+    notes: "Eslatmalar",
     settings: "Sozlamalar",
     signOut: "Chiqish",
 
@@ -75,6 +76,7 @@ export const translations = {
     tasks: "Задачи",
     calendar: "Календарь",
     categories: "Категории",
+    notes: "Заметки",
     settings: "Настройки",
     signOut: "Выйти",
 
