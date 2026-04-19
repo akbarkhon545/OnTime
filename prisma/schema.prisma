@@ -1,0 +1,84 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  passwordHash  String?
+  name          String
+  avatarUrl     String?
+  authProvider  String    @default("email") // 'email' | 'google'
+  googleId      String?
+  language      String    @default("uz") // 'uz' | 'ru'
+  timezone      String    @default("Asia/Tashkent")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  categories    Category[]
+  tasks         Task[]
+  refreshTokens RefreshToken[]
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nameUz    String
+  nameRu    String
+  color     String   // hex color: #6366F1
+  icon      String?  // emoji or icon name
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  tasks     Task[]
+}
+
+model Task {
+  id             String    @id @default(uuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId     String?
+  category       Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  title          String
+  description    String?
+  taskDate       DateTime
+  startTime      String?   // HH:mm
+  endTime        String?   // HH:mm
+  priority       String    @default("medium") // 'high' | 'medium' | 'low'
+  status         String    @default("pending") // 'pending' | 'in_progress' | 'completed' | 'cancelled'
+  isRecurring    Boolean   @default(false)
+  recurrenceRule String?   // RRULE format
+  localId        String?   // For offline sync
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  syncedAt       DateTime?
+
+  history        TaskHistory[]
+}
+
+model TaskHistory {
+  id         String   @id @default(uuid())
+  taskId     String
+  task       Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  oldStatus  String?
+  newStatus  String
+  changedAt  DateTime @default(now())
+}
+
+model RefreshToken {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token      String   @unique
+  deviceInfo String?
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+}
