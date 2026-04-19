@@ -1,18 +1,22 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { signIn } from "next-auth/react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { logoBase64 } from "@/lib/logo-base64"
+import { getTranslation, Language } from "@/lib/translations"
 
 export default function LoginPage() {
   const router = useRouter()
+  const [lang, setLang] = useState<Language>("uz")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
+
+  const t = getTranslation(lang)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -26,7 +30,7 @@ export default function LoginPage() {
     })
 
     if (result?.error) {
-      setError("Email yoki parol noto'g'ri")
+      setError(lang === "ru" ? "Неверный email или пароль" : "Email yoki parol noto'g'ri")
       setLoading(false)
     } else {
       router.push("/dashboard")
@@ -38,45 +42,68 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-block">
-            <div className="relative w-16 h-16 mx-auto mb-4 drop-shadow-2xl">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl -ml-48 -mt-48 animate-pulse" />
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl -mr-48 -mb-48 animate-pulse" />
+
+      {/* Language Switcher */}
+      <div className="absolute top-8 right-8 flex gap-2 p-1.5 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl z-20">
+        <button 
+          onClick={() => setLang("uz")}
+          className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all ${lang === "uz" ? "bg-white text-indigo-900 shadow-lg" : "text-white/50 hover:text-white"}`}
+        >
+          UZ
+        </button>
+        <button 
+          onClick={() => setLang("ru")}
+          className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all ${lang === "ru" ? "bg-white text-indigo-900 shadow-lg" : "text-white/50 hover:text-white"}`}
+        >
+          RU
+        </button>
+      </div>
+
+      <div className="w-full max-w-md relative z-10 animate-in fade-in zoom-in duration-700">
+        <div className="text-center mb-10">
+          <Link href="/" className="inline-block group">
+            <div className="relative w-20 h-20 mx-auto mb-4 drop-shadow-[0_0_30px_rgba(99,102,241,0.5)] transition-transform group-hover:scale-110 duration-500">
               <Image src={logoBase64} alt="OnTime" fill unoptimized className="object-contain" />
             </div>
-            <h1 className="text-3xl font-bold text-white">OnTime</h1>
+            <h1 className="text-4xl font-black text-white tracking-tighter">OnTime</h1>
           </Link>
         </div>
 
-        <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-8 border border-white/10 shadow-2xl">
-          <h2 className="text-2xl font-bold text-white mb-6 text-center">Kirish</h2>
+        <div className="bg-white/10 backdrop-blur-2xl rounded-[2.5rem] p-10 border border-white/10 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500" />
+          
+          <h2 className="text-3xl font-black text-white mb-2 text-center tracking-tight">{t.loginTitle}</h2>
+          <p className="text-indigo-200/50 text-sm text-center mb-10 font-medium">{t.loginDesc}</p>
 
           {error && (
-            <div className="mb-4 p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-200 text-sm">
-              {error}
+            <div className="mb-6 p-4 rounded-2xl bg-red-500/20 border border-red-500/30 text-red-200 text-xs font-bold animate-shake">
+              ⚠️ {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-indigo-200 mb-2">Email</label>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-indigo-200/50 uppercase tracking-widest ml-1">{t.email}</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all font-bold text-sm"
                 placeholder="email@example.com"
                 required
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium text-indigo-200 mb-2">Parol</label>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-indigo-200/50 uppercase tracking-widest ml-1">{lang === "ru" ? "ПАРОЛЬ" : "PAROL"}</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                className="w-full px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all font-bold text-sm"
                 placeholder="••••••••"
                 required
               />
@@ -84,21 +111,21 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 px-6 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-xl shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-4 px-8 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-black rounded-2xl shadow-xl shadow-indigo-500/20 hover:shadow-indigo-500/40 hover:-translate-y-1 transition-all active:scale-95 disabled:opacity-50 text-sm"
             >
-              {loading ? "Kirish..." : "Kirish"}
+              {loading ? "..." : (lang === "ru" ? "ВОЙТИ" : "KIRISH")}
             </button>
           </form>
 
-          <div className="my-6 flex items-center">
-            <div className="flex-1 h-px bg-white/10"></div>
-            <span className="px-4 text-sm text-white/30">yoki</span>
-            <div className="flex-1 h-px bg-white/10"></div>
+          <div className="my-8 flex items-center gap-4">
+            <div className="flex-1 h-px bg-white/5"></div>
+            <span className="text-[10px] font-black text-white/20 uppercase tracking-widest">{t.or}</span>
+            <div className="flex-1 h-px bg-white/5"></div>
           </div>
 
           <button
             onClick={handleGoogleLogin}
-            className="w-full py-3 px-6 bg-white/10 border border-white/20 text-white font-semibold rounded-xl hover:bg-white/20 hover:scale-[1.02] transition-all duration-200 flex items-center justify-center gap-3"
+            className="w-full py-4 px-8 bg-white text-slate-900 font-black rounded-2xl hover:shadow-xl hover:-translate-y-1 transition-all active:scale-95 flex items-center justify-center gap-3 text-sm"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
@@ -106,13 +133,13 @@ export default function LoginPage() {
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
             </svg>
-            Google bilan kirish
+            {t.signInWithGoogle}
           </button>
 
-          <p className="mt-6 text-center text-sm text-indigo-200/50">
-            Akkauntingiz yo&apos;qmi?{" "}
-            <Link href="/register" className="text-indigo-400 hover:text-indigo-300 transition-colors">
-              Ro&apos;yxatdan o&apos;ting
+          <p className="mt-8 text-center text-xs font-bold text-indigo-200/30">
+            {t.noAccount}{" "}
+            <Link href="/register" className="text-indigo-400 hover:text-indigo-300 transition-colors border-b border-indigo-400/30 pb-0.5 ml-1">
+              {t.signUp}
             </Link>
           </p>
         </div>

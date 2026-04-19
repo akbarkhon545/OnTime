@@ -15,15 +15,16 @@ const defaultCategories = [
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { email, password, name } = registerSchema.parse(body)
+    const { email, password, name, language } = body
 
     const existingUser = await prisma.user.findUnique({
       where: { email },
     })
 
     if (existingUser) {
+      const isRu = language === "ru"
       return NextResponse.json(
-        { message: "Bu email bilan foydalanuvchi allaqachon mavjud" },
+        { message: isRu ? "Пользователь с таким email уже существует" : "Bu email bilan foydalanuvchi allaqachon mavjud" },
         { status: 400 }
       )
     }
@@ -37,6 +38,7 @@ export async function POST(req: Request) {
           email,
           name,
           passwordHash: hashedPassword,
+          language: language || "uz",
         },
       })
 
