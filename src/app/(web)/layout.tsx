@@ -22,7 +22,9 @@ export default async function WebLayout({
         {/* Logo */}
         <div className="px-6 py-5 border-b border-slate-800">
           <Link href="/dashboard" className="flex items-center gap-3">
-            <img src="/logo-ontime.png" alt="OnTime" className="w-10 h-10 object-contain" />
+            <div className="relative w-10 h-10">
+              <Image src="/logo.png" alt="OnTime" fill unoptimized className="object-contain" />
+            </div>
             <span className="text-xl font-bold">OnTime</span>
           </Link>
         </div>
