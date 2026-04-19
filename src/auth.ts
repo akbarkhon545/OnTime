@@ -14,13 +14,14 @@ const defaultCategories = [
 ]
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  debug: process.env.NODE_ENV === "development",
+  debug: true,
   trustHost: true,
   secret: process.env.AUTH_SECRET,
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      allowDangerousEmailAccountLinking: true,
     }),
     Credentials({
       name: "Credentials",
@@ -31,31 +32,41 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null
 
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email as string },
-        })
+        try {
+          const user = await prisma.user.findUnique({
+            where: { email: credentials.email as string },
+          })
 
-        if (!user || !user.passwordHash) return null
+          if (!user || !user.passwordHash) {
+            console.log("Auth: User not found or no password hash")
+            return null
+          }
 
-        const isValid = await bcrypt.compare(
-          credentials.password as string,
-          user.passwordHash
-        )
+          const isValid = await bcrypt.compare(
+            credentials.password as string,
+            user.passwordHash
+          )
 
-        if (!isValid) return null
+          if (!isValid) {
+            console.log("Auth: Invalid password")
+            return null
+          }
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          image: user.avatarUrl,
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            image: user.avatarUrl,
+          }
+        } catch (error) {
+          console.error("Auth: Authorize error:", error)
+          return null
         }
       },
     }),
   ],
   callbacks: {
     async signIn({ user, account, profile }) {
-      // Handle Google sign in — create or find user in our DB
       if (account?.provider === "google" && profile?.email) {
         try {
           let dbUser = await prisma.user.findUnique({
@@ -63,7 +74,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           })
 
           if (!dbUser) {
-            // Create new user from Google
             dbUser = await prisma.user.create({
               data: {
                 email: profile.email,
@@ -74,7 +84,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               },
             })
 
-            // Create default categories
             await prisma.category.createMany({
               data: defaultCategories.map((cat, index) => ({
                 userId: dbUser!.id,
@@ -86,7 +95,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               })),
             })
           } else if (!dbUser.googleId) {
-            // Link Google to existing email account
             await prisma.user.update({
               where: { id: dbUser.id },
               data: {
@@ -95,11 +103,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               },
             })
           }
-
-          // Store DB user id in the user object
           user.id = dbUser.id
+          return true
         } catch (error) {
-          console.error("Google sign-in error:", error)
+          console.error("Auth: Google sign-in error:", error)
           return false
         }
       }
