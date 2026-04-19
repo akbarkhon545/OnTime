@@ -4,6 +4,8 @@ import Link from "next/link"
 import { SignOutButton } from "./components/sign-out-button"
 import Image from "next/image"
 import { logoBase64 } from "@/lib/logo-base64"
+import prisma from "@/lib/db"
+import { getTranslation } from "@/lib/translations"
 
 export default async function WebLayout({
   children,
@@ -15,6 +17,12 @@ export default async function WebLayout({
   if (!session?.user?.id) {
     redirect("/login")
   }
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+  })
+
+  const t = getTranslation(user?.language)
 
   return (
     <div className="min-h-screen bg-slate-50 flex">
@@ -32,11 +40,11 @@ export default async function WebLayout({
 
         {/* Navigation */}
         <nav className="flex-1 px-4 py-6 space-y-1">
-          <NavLink href="/dashboard" icon="📊" label="Dashboard" />
-          <NavLink href="/tasks" icon="📋" label="Vazifalar" />
-          <NavLink href="/calendar" icon="📅" label="Kalendar" />
-          <NavLink href="/categories" icon="🏷️" label="Kategoriyalar" />
-          <NavLink href="/settings" icon="⚙️" label="Sozlamalar" />
+          <NavLink href="/dashboard" icon="📊" label={t.dashboard} />
+          <NavLink href="/tasks" icon="📋" label={t.tasks} />
+          <NavLink href="/calendar" icon="📅" label={t.calendar} />
+          <NavLink href="/categories" icon="🏷️" label={t.categories} />
+          <NavLink href="/settings" icon="⚙️" label={t.settings} />
         </nav>
 
         {/* User */}
@@ -54,7 +62,7 @@ export default async function WebLayout({
               <p className="text-xs text-slate-400 truncate">{session.user.email}</p>
             </div>
           </div>
-          <SignOutButton />
+          <SignOutButton label={t.signOut} />
         </div>
       </aside>
 

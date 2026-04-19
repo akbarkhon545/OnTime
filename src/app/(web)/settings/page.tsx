@@ -2,6 +2,7 @@ import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import prisma from "@/lib/db"
 import { LanguageSelector } from "./language-selector"
+import { getTranslation } from "@/lib/translations"
 
 export default async function SettingsPage() {
   const session = await auth()
@@ -11,11 +12,13 @@ export default async function SettingsPage() {
     where: { id: session.user.id },
   })
 
+  const t = getTranslation(user?.language)
+
   return (
     <div className="p-8 max-w-3xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="mb-8">
-        <h1 className="text-3xl font-black text-slate-900 tracking-tight">⚙️ Sozlamalar</h1>
-        <p className="text-slate-500 text-sm mt-1">Profil va ilova sozlamalarini boshqarish</p>
+        <h1 className="text-3xl font-black text-slate-900 tracking-tight">⚙️ {t.settings}</h1>
+        <p className="text-slate-500 text-sm mt-1">{t.profileSettings}</p>
       </div>
 
       {/* Profile */}
@@ -24,7 +27,7 @@ export default async function SettingsPage() {
         
         <h2 className="text-xl font-bold text-slate-900 mb-8 flex items-center gap-2">
           <span className="p-2 bg-indigo-50 rounded-lg text-indigo-600 text-base">👤</span>
-          Shaxsiy ma&apos;lumotlar
+          {t.personalInfo}
         </h2>
 
         <div className="flex flex-col sm:flex-row items-center gap-8 mb-10">
@@ -56,13 +59,13 @@ export default async function SettingsPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="space-y-1.5">
-            <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">To&apos;liq ism</label>
+            <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">{t.fullName}</label>
             <div className="px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 text-slate-600 font-bold text-sm">
               {user?.name}
             </div>
           </div>
           <div className="space-y-1.5">
-            <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Elektron pochta</label>
+            <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">{t.email}</label>
             <div className="px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 text-slate-600 font-bold text-sm">
               {user?.email}
             </div>
@@ -74,46 +77,49 @@ export default async function SettingsPage() {
       <div className="bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8 mb-8">
         <h2 className="text-xl font-bold text-slate-900 mb-8 flex items-center gap-2">
           <span className="p-2 bg-purple-50 rounded-lg text-purple-600 text-base">🌐</span>
-          Til va mintaqa
+          {t.languageRegion}
         </h2>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
           <div className="space-y-3">
-            <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Ilova tili</label>
+            <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">{t.appLanguage}</label>
             <LanguageSelector initialLanguage={user?.language || "uz"} />
           </div>
           <div className="space-y-3">
-            <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">Mintaqa vaqti</label>
+            <label className="text-xs font-black text-slate-400 uppercase tracking-widest ml-1">{t.timezone}</label>
             <div className="px-5 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 text-slate-600 font-bold text-sm flex items-center justify-between">
               <span>{user?.timezone || "Asia/Tashkent"}</span>
-              <span className="text-xs font-black text-indigo-500 uppercase">Avto</span>
+              <span className="text-xs font-black text-indigo-500 uppercase">{t.auto}</span>
             </div>
             <p className="text-[10px] text-slate-400 font-medium px-1">
-              Vaqt mintaqasi qurilmangiz sozlamalariga qarab avtomatik belgilanadi.
+              {t.timezoneDesc}
             </p>
           </div>
         </div>
       </div>
 
       {/* App Info */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-        <h2 className="text-lg font-bold text-slate-900 mb-4">ℹ️ Ilova haqida</h2>
-        <div className="space-y-3 text-sm">
-          <div className="flex justify-between py-2 border-b border-slate-50">
-            <span className="text-slate-500">Versiya</span>
-            <span className="font-semibold text-slate-700">1.0.0</span>
+      <div className="bg-white rounded-[2rem] shadow-xl shadow-slate-200/50 border border-slate-100 p-8">
+        <h2 className="text-xl font-bold text-slate-900 mb-8 flex items-center gap-2">
+          <span className="p-2 bg-slate-50 rounded-lg text-slate-600 text-base">ℹ️</span>
+          {t.appInfo}
+        </h2>
+        <div className="space-y-4">
+          <div className="flex justify-between items-center py-3 border-b border-slate-50">
+            <span className="text-slate-500 font-medium">{t.version}</span>
+            <span className="font-bold text-slate-900 bg-slate-100 px-3 py-1 rounded-lg text-xs">1.0.0</span>
           </div>
-          <div className="flex justify-between py-2 border-b border-slate-50">
-            <span className="text-slate-500">Backend</span>
-            <span className="font-semibold text-slate-700">Next.js + Neon PostgreSQL</span>
+          <div className="flex justify-between items-center py-3 border-b border-slate-50">
+            <span className="text-slate-500 font-medium">{t.backend}</span>
+            <span className="font-bold text-slate-900">Next.js + Neon DB</span>
           </div>
-          <div className="flex justify-between py-2 border-b border-slate-50">
-            <span className="text-slate-500">Mobil ilova</span>
-            <span className="font-semibold text-slate-700">Android (Kotlin)</span>
+          <div className="flex justify-between items-center py-3 border-b border-slate-50">
+            <span className="text-slate-500 font-medium">{t.mobileApp}</span>
+            <span className="font-bold text-slate-900 text-indigo-600">Android (Kotlin)</span>
           </div>
-          <div className="flex justify-between py-2">
-            <span className="text-slate-500">Yaratildi</span>
-            <span className="font-semibold text-slate-700">2026</span>
+          <div className="flex justify-between items-center py-3">
+            <span className="text-slate-500 font-medium">{t.created}</span>
+            <span className="font-bold text-slate-900">2026</span>
           </div>
         </div>
       </div>
