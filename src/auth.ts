@@ -1,8 +1,8 @@
 import NextAuth from "next-auth"
 import prisma from "@/lib/db"
-import Credentials from "next-auth/providers/credentials"
-import Google from "next-auth/providers/google"
 import bcrypt from "bcryptjs"
+import authConfig from "./auth.config"
+import Credentials from "next-auth/providers/credentials"
 
 const defaultCategories = [
   { nameUz: "Ish", nameRu: "Работа", color: "#6366F1", icon: "💼" },
@@ -14,15 +14,12 @@ const defaultCategories = [
 ]
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  ...authConfig,
   debug: true,
   trustHost: true,
   secret: process.env.AUTH_SECRET,
   providers: [
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      allowDangerousEmailAccountLinking: true,
-    }),
+    ...authConfig.providers.filter(p => p.id !== "credentials"),
     Credentials({
       name: "Credentials",
       credentials: {
@@ -37,20 +34,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             where: { email: credentials.email as string },
           })
 
-          if (!user || !user.passwordHash) {
-            console.log("Auth: User not found or no password hash")
-            return null
-          }
+          if (!user || !user.passwordHash) return null
 
           const isValid = await bcrypt.compare(
             credentials.password as string,
             user.passwordHash
           )
 
-          if (!isValid) {
-            console.log("Auth: Invalid password")
-            return null
-          }
+          if (!isValid) return null
 
           return {
             id: user.id,
@@ -59,7 +50,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             image: user.avatarUrl,
           }
         } catch (error) {
-          console.error("Auth: Authorize error:", error)
           return null
         }
       },
@@ -106,7 +96,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           user.id = dbUser.id
           return true
         } catch (error) {
-          console.error("Auth: Google sign-in error:", error)
           return false
         }
       }
