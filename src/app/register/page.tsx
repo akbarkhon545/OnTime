@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -44,7 +45,9 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
-            <img src="/logo.png" alt="OnTime" className="w-16 h-16 mx-auto mb-4 drop-shadow-2xl" />
+            <div className="relative w-16 h-16 mx-auto mb-4 drop-shadow-2xl">
+              <Image src="/logo-ontime.png" alt="OnTime" fill className="object-contain" />
+            </div>
             <h1 className="text-3xl font-bold text-white">OnTime</h1>
           </Link>
         </div>

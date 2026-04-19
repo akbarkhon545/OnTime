@@ -12,7 +12,7 @@ export default function HomePage() {
         <div className="mb-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
           <div className="relative w-28 h-28 mx-auto mb-8 drop-shadow-[0_0_30px_rgba(99,102,241,0.5)] hover:scale-110 transition-transform duration-500 cursor-pointer">
             <Image 
-              src="/logo.png" 
+              src="/logo-ontime.png" 
               alt="OnTime" 
               fill
               className="object-contain"
