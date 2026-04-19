@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 
 export default function HomePage() {
   return (
@@ -9,11 +10,15 @@ export default function HomePage() {
 
       <div className="text-center max-w-2xl relative z-10">
         <div className="mb-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-          <img 
-            src="/logo.png" 
-            alt="OnTime" 
-            className="w-28 h-28 mx-auto mb-8 drop-shadow-[0_0_30px_rgba(99,102,241,0.5)] hover:scale-110 transition-transform duration-500 cursor-pointer" 
-          />
+          <div className="relative w-28 h-28 mx-auto mb-8 drop-shadow-[0_0_30px_rgba(99,102,241,0.5)] hover:scale-110 transition-transform duration-500 cursor-pointer">
+            <Image 
+              src="/logo.png" 
+              alt="OnTime" 
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
           <h1 className="text-6xl md:text-7xl font-black text-white mb-6 tracking-tight">
             OnTime<span className="text-indigo-500">.</span>
           </h1>
