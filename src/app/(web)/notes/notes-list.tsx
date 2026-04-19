@@ -11,7 +11,7 @@ interface Note {
   createdAt: Date
 }
 
-export function NotesList({ initialNotes, lang }: { initialNotes: Note[], lang: string }) {
+export function NotesList({ initialNotes, lang }: { initialNotes: any[], lang: string }) {
   const [notes, setNotes] = useState(initialNotes)
   const [isAdding, setIsAdding] = useState(false)
   const [newNote, setNewNote] = useState({ title: "", content: "", color: "#ffffff" })
