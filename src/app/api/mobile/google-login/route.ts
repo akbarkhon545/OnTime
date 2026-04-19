@@ -30,9 +30,20 @@ export async function POST(req: Request) {
         data: {
           email,
           name,
-          image: picture,
-          // Google orqali kirganlar uchun parol shart emas
+          avatarUrl: picture,
+          authProvider: "google",
+          googleId: googleId,
         },
+      })
+    } else if (!user.googleId) {
+      // Agar foydalanuvchi bor bo'lsa, lekin Google bog'lanmagan bo'lsa, bog'lab qo'yamiz
+      user = await prisma.user.update({
+        where: { email },
+        data: {
+          googleId: googleId,
+          authProvider: "google",
+          avatarUrl: user.avatarUrl || picture
+        }
       })
     }
 
