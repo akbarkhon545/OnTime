@@ -4,6 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
+import { logoBase64 } from "@/lib/logo-base64"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -46,7 +47,7 @@ export default function RegisterPage() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
             <div className="relative w-16 h-16 mx-auto mb-4 drop-shadow-2xl">
-              <Image src="/logo.png" alt="OnTime" fill unoptimized className="object-contain" />
+              <Image src={logoBase64} alt="OnTime" fill unoptimized className="object-contain" />
             </div>
             <h1 className="text-3xl font-bold text-white">OnTime</h1>
           </Link>
